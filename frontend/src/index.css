@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Подключаем локальные шрифты */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/cy-grotesk-grand-6.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.object-cover {
+  object-fit: cover;
+}
+
+.object-center {
+  object-position: center;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whitespace-normal {
+  white-space: normal;
+}
+
+.break-words {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.object-top {
+  object-position: top;
+}
+
+@layer base {
+  body {
+    @apply bg-[#F5F0E9];
+    font-family: 'Montserrat', sans-serif;
+    color: #2C1810;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant', serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[#8B6B4D] text-white px-6 py-3 rounded-none hover:bg-[#6B4F3A] transition duration-200 font-medium tracking-wider uppercase text-sm;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-[#8B6B4D] border-2 border-[#8B6B4D] px-6 py-3 rounded-none hover:bg-[#8B6B4D] hover:text-white transition duration-200 font-medium tracking-wider uppercase text-sm;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-[#D4C5B5] rounded-none focus:outline-none focus:ring-2 focus:ring-[#8B6B4D] focus:border-transparent;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .card {
+    @apply bg-white border border-[#E8DDD2] shadow-lg hover:shadow-xl transition-shadow duration-300;
+  }
+
+  .nav-link {
+    @apply flex items-center space-x-1 text-[#4A3A2C] hover:text-[#8B6B4D] transition duration-200 px-3 py-2 rounded-none tracking-wide text-sm uppercase;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl font-bold text-[#2C1810] mb-6;
+    font-family: 'Cormorant', serif;
+    letter-spacing: 0.03em;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-[#6B4F3A] mb-8 tracking-wide;
+    font-family: 'Montserrat', sans-serif;
+  }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F0E9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8B6B4D;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6B4F3A;
+}
