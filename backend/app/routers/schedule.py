@@ -258,58 +258,71 @@ def book_lesson(
         membership_type_name = membership_lesson_type.name.lower() if membership_lesson_type else ""
         lesson_type_name = lesson.lesson_type.name.lower() if lesson.lesson_type else ""
 
-        print(f"Тип абонемента: {membership_type_name}, Тип занятия: {lesson_type_name}")
+        ADULT_YOGA = "взрослая йога"
+        KIDS_YOGA_PREFIX = "детская йога"
+        FITNESS_GROUP = {"фитнес", "пилатес", "танцы"}
+        STRETCHING = "растяжка"
+        FULL_ACCESS = "полный"
+        YOGA_HAMMOCK = "йога в гамаках"
 
-        # Проверяем соответствие
         is_match = False
 
-        # 1. Если абонемент "Полный" - можно на всё, кроме детской йоги
-        if "полный" in membership_type_name:
-            if "детская" not in lesson_type_name:
+        # 1. Абонемент "Полный" — всё, кроме детской йоги
+        if membership_type_name == FULL_ACCESS:
+            if KIDS_YOGA_PREFIX not in lesson_type_name:
                 is_match = True
-                print("Абонемент 'Полный' - разрешены все взрослые направления")
+                print("Абонемент 'Полный' — разрешены все взрослые направления")
             else:
                 print("Абонемент 'Полный' НЕ работает для детской йоги")
 
-        # 2. Специальная проверка для "Йога в гамаках" (только "Полный")
-        elif "йога в гамаках" in lesson_type_name:
-            # Разрешена только для "Полный" (уже обработано выше, но если не "Полный" - запрещено)
+        # 2. Абонемент "Детская йога" — только детская йога
+        elif membership_type_name.startswith(KIDS_YOGA_PREFIX):
+            if KIDS_YOGA_PREFIX in lesson_type_name:
+                is_match = True
+                print("Абонемент 'Детская йога' — разрешены только детские занятия")
+            else:
+                print("Абонемент 'Детская йога' НЕ подходит для этого занятия")
+
+        # 3. Абонемент "Взрослая йога" — только взрослая йога
+        elif membership_type_name == ADULT_YOGA:
+            if lesson_type_name == ADULT_YOGA:
+                is_match = True
+                print("Абонемент 'Взрослая йога' — только взрослая йога")
+            else:
+                print("Абонемент 'Взрослая йога' НЕ подходит для этого занятия")
+
+        # 4. Абонемент "Растяжка" — только растяжка
+        elif membership_type_name == STRETCHING:
+            if lesson_type_name == STRETCHING:
+                is_match = True
+                print("Абонемент 'Растяжка' — только растяжка")
+            else:
+                print("Абонемент 'Растяжка' НЕ подходит для этого занятия")
+
+        # 5. Абонемент "Фитнес" / "Пилатес" — фитнес, пилатес, танцы (но не йога и не растяжка)
+        elif membership_type_name in FITNESS_GROUP:
+            if lesson_type_name in FITNESS_GROUP:
+                is_match = True
+                print("Абонемент 'Фитнес/Пилатес' — разрешены фитнес, пилатес, танцы")
+            else:
+                print("Абонемент 'Фитнес/Пилатес' НЕ подходит для этого занятия")
+
+        # 6. Специальный случай: "Йога в гамаках" — доступна только по "Полный"
+        elif lesson_type_name == YOGA_HAMMOCK:
+            # Если сюда попали, значит абонемент не "Полный" (иначе сработал бы пункт 1)
             print("Йога в гамаках доступна только по абонементу 'Полный'")
-            # is_match останется False, т.к. мы в этом блоке только если не "Полный"
+            is_match = False
 
-        # 3. Проверка для "Танцы" (доступны по "Полный" и "Фитнес")
-        elif "танцы" in lesson_type_name:
-            # Разрешена для "Полный" или для абонементов группы "Фитнес"
-            if "полный" in membership_type_name or any(
-                    x in membership_type_name for x in ["фитнес", "пилатес", "йога"]):
+        # 7. Остальные абонементы (например, "Танцы", если появятся) — только свой тип
+        else:
+            # Если названия совпадают точно (для уникальных типов)
+            if membership_type_name == lesson_type_name:
                 is_match = True
-                print("Танцы доступны по абонементам 'Полный' и 'Фитнес'")
+                print(f"Абонемент '{membership_type_name}' — только занятия того же типа")
+            else:
+                print(f"Абонемент '{membership_type_name}' не подходит для занятия '{lesson_type_name}'")
 
-        # 4. Проверка для детской йоги (можно на любую детскую йогу)
-        elif "детская йога" in membership_type_name and "детская йога" in lesson_type_name:
-            is_match = True
-
-        # 5. Проверка для взрослой йоги
-        elif "взрослая йога" in membership_type_name and "взрослая йога" in lesson_type_name:
-            is_match = True
-
-        # 6. Проверка для фитнес-пилатес-йога (включая танцы, исключая йога в гамаках и детскую)
-        elif any(x in membership_type_name for x in ["фитнес", "пилатес", "йога"]) and \
-                any(x in lesson_type_name for x in ["фитнес", "пилатес", "йога", "танцы"]):
-            # Исключаем йога в гамаках и детскую йогу
-            if "йога в гамаках" not in lesson_type_name and "детская" not in lesson_type_name:
-                is_match = True
-
-        # 7. Проверка для растяжки
-        elif "растяжка" in membership_type_name and "растяжка" in lesson_type_name:
-            is_match = True
-
-        # 8. Проверка для разовых абонементов (они привязаны к конкретному типу)
-        elif membership_type_name in lesson_type_name or lesson_type_name in membership_type_name:
-            # Проверяем, что это не перекрестные случаи
-            if "йога" not in membership_type_name or "йога" in lesson_type_name:
-                is_match = True
-
+        # Если не совпало — ошибка
         if not is_match:
             print(
                 f"Несоответствие типов: абонемент '{membership_type_name}' нельзя использовать для занятия '{lesson_type_name}'")
