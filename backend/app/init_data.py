@@ -60,6 +60,16 @@ def init_db():
                 capacity=10,
                 description="Абонемент на все направления: фитнес, пилатес, йога, растяжка"
             ),
+            models.TypeLesson(
+                name="Танцы",
+                capacity=8,
+                description="Танцевальные тренировки для развития координации, пластики и чувства ритма"
+            ),
+            models.TypeLesson(
+                name="Йога в гамаках",
+                capacity=6,
+                description="Йога с использованием гамаков для глубокого расслабления и растяжки"
+            ),
         ]
         db.add_all(lesson_types)
         db.flush()

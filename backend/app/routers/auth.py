@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Any
 from jose import JWTError, jwt  # Добавляем JWTError в импорт
 
 from .. import auth
+from ..models import models
 from ..database import get_db
 from ..models.models import User
 from ..schemas.user import UserCreate, UserResponse, Token, UserLogin
@@ -51,6 +53,46 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
+    # ===== ВЫДАЧА БЕСПЛАТНОГО АБОНЕМЕНТА =====
+    try:
+        # Находим бесплатное предложение (Полный, 1 занятие, цена 0)
+        free_offer = db.query(models.MembershipOffer)\
+            .options(
+                joinedload(models.MembershipOffer.lesson_count),
+                joinedload(models.MembershipOffer.valid_days)
+            )\
+            .filter(
+                models.MembershipOffer.price == 0,
+                models.MembershipOffer.lesson_count.has(models.LessonCount.count == 1)
+            )\
+            .first()
+
+        if free_offer:
+            start_date = datetime.today()
+            end_date = start_date + timedelta(days=free_offer.valid_days.count_day)
+
+            new_membership = models.UserMembership(
+                user_id=db_user.id,
+                membership_offer_id=free_offer.id,
+                purchase_date=start_date,
+                start_date=start_date,
+                end_date=end_date,
+                remaining_classes=1,
+                status=models.MembershipStatus.ACTIVE
+            )
+
+            db.add(new_membership)
+            db.commit()
+            print(f"✅ Бесплатный абонемент выдан пользователю {db_user.id}")
+        else:
+            print("⚠️ Бесплатный абонемент не найден")
+    except Exception as e:
+        print(f"❌ Ошибка при выдаче бесплатного абонемента: {e}")
+        # Не прерываем регистрацию, если не удалось выдать абонемент
+        import traceback
+        traceback.print_exc()
+    # ===== КОНЕЦ ВЫДАЧИ =====
 
     return db_user
 
