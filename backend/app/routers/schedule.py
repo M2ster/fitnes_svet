@@ -260,7 +260,7 @@ def book_lesson(
 
         ADULT_YOGA = "взрослая йога"
         KIDS_YOGA_PREFIX = "детская йога"
-        FITNESS_GROUP = {"фитнес", "пилатес", "танцы"}
+        FITNESS_GROUP = {"фитнес", "пилатес", "танцы", "взрослая йога"}
         STRETCHING = "растяжка"
         FULL_ACCESS = "полный"
         YOGA_HAMMOCK = "йога в гамаках"
